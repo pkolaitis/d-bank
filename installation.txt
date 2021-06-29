@@ -1,0 +1,4 @@
+npm install -g @angular/cli@latest
+npm install -g forever
+( run forever --help for observations )
+npm install

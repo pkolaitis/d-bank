@@ -1,0 +1,43 @@
+/* You can add global styles to this file, and also import other style files */
+body {
+    background-color: #f1f2f4 !important;
+  }
+  h1 {
+    padding: 10px 15px;
+    margin: auto;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  .btn {
+    margin: 0 10px;
+  }
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    width: auto;
+    display: block;
+    margin: auto;
+  }
+  .loader {
+    border: 16px solid #fff;
+    /* Light grey */
+    border-top: 16px solid #3498db;
+    /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    margin: auto;
+  }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  

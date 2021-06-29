@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  
+  app:
+    image: nodejs
+    command: 
+      - cd /back-end
+      - npm install
+      - forever start server.js
+      - cd /front-end
+      - npm install
+      - ng serve
+    volumes:
+      - ./back-end:/back-end
+      - ./front-end:/front-end
+    ports:
+      - "127.0.0.1:4201:4201"
+      - "127.0.0.1:4200:4200"
+    environment:
+      PORT: 4201
+      REPLICAS: 16
+      DDELAY: 2000
+

@@ -1,0 +1,19 @@
+{
+  "name": "back-end",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "@angular/cli": "^12.1.0",
+    "cluster": "^0.7.7",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "forever": "^4.0.1",
+    "http": "0.0.1-security",
+    "os": "^0.1.1",
+    "path": "^0.12.7"
+  }
+}
