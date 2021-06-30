@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "start:prod": "ng serve --host 0.0.0.0 --port 4200 --disable-host-check"
   },
   "private": true,
   "dependencies": {
@@ -26,7 +27,6 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.1.0",
-    "@angular/cli": "~12.1.0",
     "@angular/compiler-cli": "~12.1.0",
     "@types/jasmine": "~3.6.0",
     "@types/node": "^12.11.1",

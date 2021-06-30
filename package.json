@@ -1,0 +1,10 @@
+{
+  "name": "d-bank",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "docker-compose build",
+    "launch": "docker-compose up --remove-orphans -d",
+    "ci": "npm run build && npm run launch"
+  },
+  "private": true
+}
