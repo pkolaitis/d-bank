@@ -46,7 +46,7 @@ if( cluster.isMaster ) {
 }
 else {
   const app = express();
-  cluster.workerData = {
+  process.workerData = {
     id: process.pid,
     greeting: 'Worker ' + process.pid + ' responded'
   };
@@ -64,7 +64,7 @@ else {
     process.send({ cmd: 'notifyRequest' });
     process.send({ cmd: 'broadcast' });
     setTimeout(()=>{
-        const result = cluster.workerData;
+        const result = process.workerData;
         console.log(result);
         res.send(result);
     }, CONFIG.DDELAY);  
