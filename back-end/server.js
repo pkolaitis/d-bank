@@ -1,82 +1,64 @@
 const cluster = require('cluster');
-const http = require('http');
-const cors = require('cors');
-const CONFIG = require('./config/config');
-const express = require( 'express' );
-const path = require( 'path' );
-const workers = [];
-var numReqs = 0;
 
-var root = path.dirname( __dirname );
-console.log(CONFIG);
-if( cluster.isMaster ) {
+const path = require('path');
+var root = path.dirname(__dirname);
+
+const configManager = require('./services/configManager');
+const routeManager = require('./services/routeManager');
+const replicaManager = require('./services/replicaManager');
+const logManager = require('./services/logManager');
+
+// logManager.info(JSON.stringify(configManager));
+
+if (cluster.isMaster) {
   // Create a worker for each CPU
-  var broadcast = function() {
-    for (var i in workers) {
-      var worker = workers[i];
-      worker.send({ cmd: 'broadcast', numReqs: numReqs });
-    }
-  }
-  for( var i = 0; i < CONFIG.REPLICAS; i++ ) {
-    workers.push(cluster.fork());
-    workers[i].on('message', function(msg) {
+
+  for (var i = 0; i < configManager.replicas; i++) {
+    const worker = cluster.fork(); 
+    worker.on('message', function(msg) {
+
+    logManager.info(`worker got message ${JSON.stringify(msg)}`);
       if (msg.cmd) {
         switch (msg.cmd) {
-          case 'notifyRequest':
-            numReqs++;
-          break;
           case 'broadcast':
-            broadcast();
+            broadcast(msg);
           break;
         }
       }
     });
+    replicaManager.workers.push(worker);
+  }
+  var broadcast = function(data) {
+    logManager.info(`starting broadcasting ${JSON.stringify(data)}`);
+    for (var i in replicaManager.workers) {
+      var worker = replicaManager.workers[i];
+      worker.send({ cmd: 'broadcast', data: data });
+    }
   }
   
-  setInterval(function() {
-    console.log("numReqs =", numReqs);
-  }, 1000);
+  // setInterval(function () {
+  //   logManager.info(`numReqs = ${replicaManager.numReqs}`);
+  // }, configManager.pdelay);
 
-  cluster.on( 'online', function( worker ) {
-    console.log( 'Worker ' + worker.process.pid + ' is online.' );
+  cluster.on('online', function (worker) {
+    logManager.info(`Worker ${worker.process.pid} is online.`);
+    worker.process.workers = replicaManager.workers;
   });
-  cluster.on( 'exit', function( worker, code, signal ) {
-    console.log( 'worker ' + worker.process.pid + ' died.' );
+  cluster.on('exit', function (worker, code, signal) {
+    logManager.info(`Worker ${worker.process.pid} died.`);
   });
-}
-else {
-  const app = express();
-  process.workerData = {
-    id: process.pid,
-    greeting: 'Worker ' + process.pid + ' responded'
-  };
+} else {
+  const app = replicaManager.initializeNewReplica();
+  routeManager.registerAll(app);
 
   process.on('message', function(msg) {
     switch(msg.cmd) {
       case 'broadcast':
+        logManager.info(`${process.pid} got message ${JSON.stringify(msg)}`);
         if (msg.numReqs) console.log(process.pid + 'Number of requests: ' + msg.numReqs);
       break;
     }
   });
 
-  app.get('/', cors(), (req, res) => {
-    // cluster.send('message', message);
-    process.send({ cmd: 'notifyRequest' });
-    process.send({ cmd: 'broadcast' });
-    setTimeout(()=>{
-        const result = process.workerData;
-        console.log(result);
-        res.send(result);
-    }, CONFIG.DDELAY);  
-  });
-
-  app.use(cors()).listen( CONFIG.PORT);
-
-  cluster.addListener('message', function(data){
-    console.log('Worker ' + process.pid + ' received data:' + data.message + data.id);
-  });
-  const message = {message: 'Worker ' + process.pid + ' responded.', id: process.pid };
-  cluster.emit('message', message);
-  
-
+  app.listen(configManager.port);
 }

@@ -10,10 +10,10 @@ services:
     ports:
       - 4201:4201
     environment:
-      PORT: 4201
-      REPLICAS: 16
-      DDELAY: 2000
-
+      port: 4201
+      replicas: 16
+      ddelay: 2000
+      logLevel: 4
        
   app:
     image: d-bank-front-end
