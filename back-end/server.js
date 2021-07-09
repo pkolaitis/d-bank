@@ -17,7 +17,7 @@ const authManager = require('./services/authManager');
 
 if (cluster.isMaster) {
   // Create a worker for each CPU
-  process.data = replicaManager.data;
+  // process.data = replicaManager.data;
   var createReplica = function(){
     const worker = cluster.fork(); 
     worker.on('message', function(msg) {
@@ -27,15 +27,15 @@ if (cluster.isMaster) {
           case 'broadcast':
             broadcast(msg);
             logManager.info(`${process.pid} got message ${JSON.stringify(msg)} ${msg.event}`);
-            if(msg.event === "transaction") {
-              const transaction = msg.data;
-              process.data.transactions = process.data.transactions || {};
-              process.data.transactions.size = (process.data.transactions.size || 0) + 1;
-              process.data.transactions[transaction.processAt] = process.data.transactions[transaction.processAt] || [];
-              process.data.transactions[transaction.processAt].push(transaction);
-              process.data.history = process.data.history || [];
-              process.data.history.push(transaction);
-            }
+            // if(msg.event === "transaction") {
+            //   const transaction = msg.data;
+            //   process.data.transactions = process.data.transactions || {};
+            //   process.data.size = (process.data.size || 0) + 1;
+            //   process.data.transactions[transaction.processAt] = process.data.transactions[transaction.processAt] || [];
+            //   process.data.transactions[transaction.processAt].push(transaction);
+            //   process.data.history = process.data.history || [];
+            //   process.data.history.push(transaction);
+            // }
           break;
           
         }
@@ -50,6 +50,7 @@ if (cluster.isMaster) {
   };
   var broadcast = function(data) {
     logManager.info(`starting broadcasting ${JSON.stringify(data)}`);
+    logManager.info(`${Object.keys(replicaManager.workers)}`)
     for (var i in replicaManager.workers) {
       var worker = replicaManager.workers[i];
       worker.send(data);
@@ -58,34 +59,9 @@ if (cluster.isMaster) {
   for (var i = 0; i < configManager.replicas; i++) {
     createReplica();
   }
-  var sendStatistics = function(req, res){
-    const result = [];
-    result.push({
-      isParent: true,
-      pid: process.pid,
-      users: process.data.users,
-      transactions: { 
-        failed: process.data.history.filter(x=>x.failed).length,
-        successful: process.data.history.filter(x=>x.passed).length,
-        all: process.data.history.length
-      }
-    });
-    for(let index in replicaManager.workers){
-      const worker = replicaManager.workers[index];
-      result.push({
-        pid: worker.process.pid,
-        users: worker.process.data.users,
-        transactions: { 
-          failed: worker.process.data.history.filter(x=>x.failed).length,
-          successful: worker.process.data.history.filter(x=>x.passed).length,
-          all: worker.process.data.history.length
-        }
-      });
-    }
-    requestManager.reply(res, result);
-  };
+  
 
-  setInterval(transactionManager.processTransactions, configManager.processWindow);
+  // setInterval(transactionManager.processTransactions, configManager.processWindow);
   setInterval(function () {
     // logManager.info(`numReqs = ${replicaManager.numReqs}`);
     // logManager.info(`Running checks for inconstistencies`);
@@ -121,11 +97,38 @@ if (cluster.isMaster) {
     delete replicaManager.workers[worker.process.pid];
     createReplica();
   });
-  const app = express();
-  app.use(cors());
-  app.get('/getStatistics', cors(), authManager.verifyToken, sendStatistics);
-  app.listen(configManager.port+1);
-  logManager.info(`${process.pid} listening for statistics`);
+
+  // var sendStatistics = function(req, res){
+  //   const result = [];
+  //   result.push({
+  //     isParent: true,
+  //     pid: process.pid,
+  //     users: process.data.users,
+  //     transactions: { 
+  //       failed: process.data.history.filter(x=>x.failed).length,
+  //       successful: process.data.history.filter(x=>x.passed).length,
+  //       all: process.data.history.length
+  //     }
+  //   });
+  //   for(let index in replicaManager.workers){
+  //     const worker = replicaManager.workers[index];
+  //     result.push({
+  //       pid: worker.process.pid,
+  //       users: worker.process.data.users,
+  //       transactions: { 
+  //         failed: worker.process.data.history.filter(x=>x.failed).length,
+  //         successful: worker.process.data.history.filter(x=>x.passed).length,
+  //         all: worker.process.data.history.length
+  //       }
+  //     });
+  //   }
+  //   requestManager.reply(res, result);
+  // };
+  // const app = express();
+  // app.use(cors());
+  // app.get('/getStatistics', cors(), authManager.verifyToken, sendStatistics);
+  // app.listen(configManager.port+1);
+  // logManager.info(`${process.pid} listening for statistics`);
 } else {
   const app = replicaManager.initializeNewReplica();
   routeManager.registerAll(app);
@@ -139,7 +142,7 @@ if (cluster.isMaster) {
         if(msg.event === "transaction") {
           const transaction = msg.data;
           process.data.transactions = process.data.transactions || {};
-          process.data.transactions.size = (process.data.transactions.size || 0) + 1;
+          process.data.size = (process.data.size || 0) + 1;
           process.data.transactions[transaction.processAt] = process.data.transactions[transaction.processAt] || [];
           process.data.transactions[transaction.processAt].push(transaction);
           process.data.history = process.data.history || [];

@@ -12,13 +12,12 @@ const transactionManager = {
   },
   processTransactions: function () {
     const max = new Date().getTime();
-    const min = max - 2 * configManager.processWindow;
+    const min = max - configManager.processWindow;
     const times = Object.keys(process.data.transactions).filter(x => x < max && x >= min);
     times.forEach(timestamp => {
       process.data.transactions[timestamp].forEach(transaction => {
-        if(process.data.users[transaction.source] && transaction.amount > 0 && !transaction.passed){
-        logManager.info(`${process.pid} processing transaction ${JSON.stringify(transaction)}`);
-        if(transaction.type === "deposit"){
+        if(process.data.users[transaction.source] && transaction.amount > 0 && !transaction.passed && !transaction.failed){
+          if(transaction.type === "deposit"){
             transaction.passed = true;
             process.data.users[transaction.source].balance += transaction.amount;
           } else if (transaction.type === "withdraw" && process.data.users[transaction.source].balance >= transaction.amount) {
@@ -34,29 +33,37 @@ const transactionManager = {
         }else{
           transaction.failed = true;
         }
+        logManager.info(`${process.pid} processing transaction ${JSON.stringify(transaction)}`);
       });
     });
   },
-  getTotalFailed: function(transactions, user){
+  getTotals: function(transactions, user){
     const times = Object.keys(transactions);
-    const counter = 0;
+    const result = {
+      failed: 0,
+      passed: 0,
+      total: 0,
+    };
+    console.log(JSON.stringify(times));
     times.forEach(timestamp => {
+      console.log(JSON.stringify(transactions[timestamp]));
       transactions[timestamp].forEach(transaction => {
-        if(transaction.failed) counter++;
+        if(transaction.failed) result.failed++;
+        else if(transaction.passed) result.passed++;
+        result.total++;
       });
     });
-    return counter;
+    return result;
   },
 
-  getTotalPassed: function(transactions, user){
-    const times = Object.keys(transactions);
-    const counter = 0;
-    times.forEach(timestamp => {
-      transactions[timestamp].forEach(transaction => {
-        if(transaction.passed) counter++;
-      });
+  getStatistics: function(req, res){
+    const result = [];
+    result.push({
+      pid: process.pid,
+      users: req.user.username === 'admin' ? process.data.users : [process.data.users[req.user.username]],
+      totals: transactionManager.getTotals(process.data.transactions) 
     });
-    return counter;
+    return result;
   },
   getTransactions: function(user){
     logManager.info(`Getting transactions about user ${user.username}`);

@@ -80,6 +80,14 @@ const routeManager = {
             }
         },
         {
+            path: '/getStatistics', 
+            guard: authManager.verifyToken, 
+            method: (req, res) => {
+                const result = transactionManager.getStatistics(req, res);
+                requestManager.reply(res, {user: req.user, msg: 'Get statistics', statistics: result});
+            }
+        },
+        {
             path: '/history', 
             guard: authManager.verifyToken, 
             method: (req, res) => {

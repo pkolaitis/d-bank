@@ -12,7 +12,8 @@ export class StatisticsComponent implements OnInit {
   constructor(private statisticsService: StatisticsService) { }
 
   ngOnInit(): void {
-    this.statisticsService.statistics.subscribe((x:any) => this.statistics = x);
+    this.statisticsService.statistics.subscribe((x:any) => console.log(this.statistics = x));
+    this.statisticsService.getStatistics();
   }
 
 }

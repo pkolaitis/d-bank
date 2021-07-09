@@ -14,6 +14,7 @@ const replicaManager = {
         const app = express();
         process.numReqs = 0;
         process.data = replicaManager.data;
+        
         process.on('message', function (msg) {
             switch (msg.cmd) {
                 case 'transaction':
