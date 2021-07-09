@@ -9,12 +9,13 @@ const authManager = {
     const id  = req.headers.id;
     const username = req.headers.username;
     const password = req.headers.password;
+    const user = userManager.isValidLoginInfo(username,password);
     if(userManager.isValidLoginInfo(username,password)){
-      jwt.sign( {username, password, time: new Date() } , 'secret_key' , (err,token) => {
+      jwt.sign( {time: new Date(), ...user } , 'secret_key' , (err,token) => {
           if(err){
-              requestManager.reply(res, {msg : 'Error'});
+              requestManager.reply(res, {msg: 'Error'});
           } else {
-              requestManager.reply(res, {msg:'success' , token: token});
+              requestManager.reply(res, {msg:'success' , token: token, user: {time: new Date(), ...user }});
           }
       });
     } else {
@@ -40,6 +41,7 @@ const authManager = {
               logManager.error(`Error authenticating with passed token ${token}: ${err}`);
               requestManager.reply(res, {authorized: false, reason: 'unauthorized token passed'});
           } else {
+            logManager.info(`User ${JSON.stringify(user)} authenticated`);
             req.user = user;
             logManager.info(`Authenticated token ${token}`);
             next();

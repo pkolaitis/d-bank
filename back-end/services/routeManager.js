@@ -3,6 +3,7 @@ const logManager = require('./logManager');
 const authManager = require('./authManager');
 const requestManager = require('./requestManager');
 const transactionManager = require('./transactionManager');
+const configManager = require('./configManager');
 const routeManager = {
     routes: [
         {
@@ -54,6 +55,18 @@ const routeManager = {
 
                 const result = {pid: process.pid, message: `list of transactions`};
                 requestManager.reply(res, result);
+            }
+        },
+        {
+            path: '/kill', 
+            cors: cors(),
+            guard: authManager.nullToken, 
+            method: (req, res) => {
+                const result = {pid: process.pid, message: `killing worker`};
+                requestManager.reply(res, result);
+                setTimeout(function(){
+                    throw `${process.pid} was killed by user`;
+                }, configManager.rttdelay);
             }
         }
     ],

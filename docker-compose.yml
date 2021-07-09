@@ -1,7 +1,5 @@
 version: "3.7"
 services:
-  # db: 
-
   server:
     image: d-bank-server
     build: 
@@ -13,7 +11,11 @@ services:
       port: 4201
       replicas: 16
       ddelay: 2000
+      pdelay: 2000
       logLevel: 4
+      addRandomness: false
+      rttdelay: 10
+      superpass: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aW1lIjoiMjAyMS0wNy0wOFQxNTowNToxNS44MDhaIiwidXNlcm5hbWUiOiJhZG1pbiIsInBhc3N3b3JkIjoiYWRtaW4iLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE2MjU3NTY3MTV9.R0PYYpPW2-flxAyxNpU8melSbb_Zz_3ns2Zm7PQ0Iy8"
        
   app:
     image: d-bank-front-end
