@@ -16,7 +16,6 @@ export class AppComponent implements OnInit {
     this.httpClient.get<any>('http://localhost:4201').subscribe(
       (response) => {
         this.text = JSON.stringify(response);
-        console.log('got the response');
         console.log(this.text);
       }
     );

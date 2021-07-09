@@ -2,6 +2,12 @@
 body {
     background-color: #f1f2f4 !important;
   }
+  select {
+    display: inline-block;
+    height: 36px;
+    line-height: 36px;
+    width: 95%;
+  }
   h1 {
     padding: 10px 15px;
     margin: auto;
@@ -20,6 +26,12 @@ body {
     width: auto;
     display: block;
     margin: auto;
+  }
+  .error {
+    width: 100%;
+    margin-top: .25rem;
+    font-size: 80%;
+    color: #dc3545;
   }
   .loader {
     border: 16px solid #fff;

@@ -1,0 +1,45 @@
+.transactions-container { 
+    background-color: #f1f1f1 
+}
+.transaction-box {
+    position: relative;
+    margin: 0px 5px 10px;
+    padding: 10px;
+}
+.transaction-box > * {
+    padding: 5px;
+    text-align: left;
+}
+
+.amount {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    left: auto;
+}
+.info {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 14px;
+    left: auto;
+    top: auto;
+}
+.amount.deposit, .info.passed i:before {
+    color: #191;
+}
+.amount.withdraw, .info.failed i:before {
+    color: #911;
+}
+.amount.transfer, .info.pending i:before {
+    color: rgb(221, 133, 18);
+}
+.box-area {
+    display: inline-block;
+    width: 49%;
+    vertical-align: top;
+    &.middle {
+        vertical-align: middle;
+    }
+}

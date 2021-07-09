@@ -1,5 +1,5 @@
 const logManager = {
-    logLevel: process.env.logLevel || 4,
+    logLevel: process.env.logLevel || 1,
     // dbConnection: {},
     info: function (message) {
       if(logManager.logLevel >=4){

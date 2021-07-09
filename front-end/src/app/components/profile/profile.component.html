@@ -1,1 +1,33 @@
-<p>profile works!</p>
+<div *ngIf="user && user.username">
+    <h2>User information</h2>
+    <div class="container p-2">
+        <div class="row">
+        <div class="col-sm-6 text-right">
+            username: 
+        </div>
+        <div class="col-sm-6 text-left">
+            {{user.username}}
+        </div>
+        </div>
+    </div>
+    <div class="container p-2">
+        <div class="row">
+            <div class="col-sm-6 text-right">
+                balance:
+            </div>
+            <div class="col-sm-6 text-left">
+                {{user.balance}}
+            </div>
+        </div>
+    </div>
+    <div class="container p-2">
+        <div class="row">
+            <div class="col-sm-6 text-right">
+                replica responded:
+            </div>
+            <div class="col-sm-6 text-left">
+                {{user.replica}}
+            </div>
+        </div>
+    </div>
+</div>  

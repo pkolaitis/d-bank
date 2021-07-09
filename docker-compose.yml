@@ -9,6 +9,7 @@ services:
       - 4201:4201
     environment:
       port: 4201
+      statPort: 4202
       replicas: 16
       ddelay: 2000
       pdelay: 2000

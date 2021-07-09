@@ -8,6 +8,7 @@ const replicaManager = {
     data: {
         users: users,
         transactions: {},
+        history: []
     },
     initializeNewReplica: function () {  
         const app = express();

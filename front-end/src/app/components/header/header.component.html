@@ -12,11 +12,13 @@
 
 </div>
 <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm container justify-content-center">
-  <div>Go to </div>
   <div class="align-self-center">
-    <a *ngFor="let menuLink of menuLinks"
+    <a *ngFor="let menuLink of getMenuLinks()"
       (click)="refreshSelectedLink(menuLink)"
       [class]="'btn ' + ( menuLink.isSelected ? 'btn-primary' : 'btn-outline-primary' )"
       [routerLink]="menuLink.availableUrls[0]">{{menuLink.title}}</a>
+    <a (click)="refresh()" class="btn btn-outline-primary">
+      <i class="bi bi-arrow-counterclockwise"></i>
+    </a>
   </div>
 </div>

@@ -13,7 +13,8 @@ const users = {
     user11: {username: 'user11', password: 'user11', balance: 1800},
     user12: {username: 'user12', password: 'user12', balance: 1600},
     user13: {username: 'user13', password: 'user13', balance: 1900},
-    user14: {username: 'user14', password: 'user14', balance: 1950}
+    user14: {username: 'user14', password: 'user14', balance: 1950},
+    user15: {username: 'user15', password: 'user15', balance: 13950},
 };
 
 module.exports = users;

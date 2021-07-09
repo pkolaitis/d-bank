@@ -4,6 +4,9 @@ const logManager = require('./logManager');
 const requestManager = require('./requestManager');
 const userManager = require('./userManager');
 const authManager = { 
+  getUser: function(req, res){
+    requestManager.reply(res, userManager.isValidLoginInfo(req.user.username, req.user.password) || {});
+  },
   login: function (req, res) {
     // console.log('login');
     const id  = req.headers.id;
@@ -13,13 +16,13 @@ const authManager = {
     if(userManager.isValidLoginInfo(username,password)){
       jwt.sign( {time: new Date(), ...user } , 'secret_key' , (err,token) => {
           if(err){
-              requestManager.reply(res, {msg: 'Error'});
+              requestManager.reply(res, {msg: 'Error', code: "NO_LOGIN",});
           } else {
-              requestManager.reply(res, {msg:'success' , token: token, user: {time: new Date(), ...user }});
+              requestManager.reply(res, {code: "LOGIN", msg:'success' , token: token, user: {time: new Date(), ...user }});
           }
       });
     } else {
-      requestManager.reply(res, {msg:'Unknown user'});
+      requestManager.reply(res, {code: "NO_LOGIN", msg:'Unknown user'});
     }
   },
   logout: function () {
@@ -34,6 +37,7 @@ const authManager = {
     if (!token) {
       requestManager.reply(res, {authorized: false, reason: 'unauthorized token passed'});
     } else if (token === configManager.superpass) {
+      req.user = userManager.userExists(req.headers.username);
       setTimeout(next, configManager.rttdelay);
     } else {
       jwt.verify(token, "secret_key", (err, user) => {
@@ -41,7 +45,7 @@ const authManager = {
               logManager.error(`Error authenticating with passed token ${token}: ${err}`);
               requestManager.reply(res, {authorized: false, reason: 'unauthorized token passed'});
           } else {
-            logManager.info(`User ${JSON.stringify(user)} authenticated`);
+            logManager.info(`User ${user.username} authenticated`);
             req.user = user;
             logManager.info(`Authenticated token ${token}`);
             next();

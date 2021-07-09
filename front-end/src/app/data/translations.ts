@@ -15,11 +15,14 @@ const Translations = {
   menuLinks: {
     home: 'Home',
     login: 'Login',
+    logout: 'Logout',
     register: 'Register',
     profile: 'Profile',
     reset: 'Reset',
     transactions: "Transactions",
-    actions: "Actions"
+    actions: "Actions",
+    scenarios: "Scenarios",
+    statistics: "Statistics"
   },
   
   logOptions: {

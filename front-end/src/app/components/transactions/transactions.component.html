@@ -1,1 +1,64 @@
-<p>transactions works!</p>
+<div class="box-area"><app-profile></app-profile></div>
+<div class="box-area">
+    <h2>Submit a transaction</h2>
+    <form [formGroup]="transactionForm" (ngSubmit)="postTransaction()">
+        <div class="form-group box-area middle">
+            <label for="type">Type </label>
+            <select formControlName="type" [ngClass]="{ 'is-invalid': submitted && f && f.type.errors }">
+                <option value=""></option>
+                <option value="withdraw">Withdraw</option>
+                <option value="deposit">Deposit</option>
+                <option value="transfer">Transfer</option>
+            </select>
+            <div *ngIf="submitted && f && f.type.errors" class="invalid-feedback">
+                <div *ngIf="f && f.type.errors.required">Type is required</div>
+            </div>
+        </div>
+        <div class="form-group box-area middle">
+            <label for="amount">Amount</label>
+            <input type="text" formControlName="amount" class="form-control" [ngClass]="{ 'is-invalid': submitted && f && f.amount.errors }" />
+            <div *ngIf="submitted && f && f.amount.errors" class="invalid-feedback">
+                <div *ngIf="f && f.amount.errors.required">Amount is required</div>
+            </div>
+        </div>
+
+        <div class="form-group  md-4 box-area middle">
+            <label for="target">Target</label>
+            <input type="text" formControlName="target" class="form-control" />
+        </div>
+        <div class="form-group box-area middle">
+            <button [disabled]="loading" class="btn btn-primary">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                Post
+            </button>
+        </div>
+    </form>
+    <div class="error">
+        {{genericError}}
+    </div>
+</div>
+<div class="container transactions-container">
+    <h2>Here you can see your transactions</h2>
+    <div class="transaction-box shadow-sm" *ngFor="let transaction of transactions">
+        <div class="info passed" *ngIf="transaction.passed">
+            Passed
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="info failed" *ngIf="!transaction.passed && transaction.failed">
+            Failed
+            <i class="bi bi-dash-circle"></i>
+        </div>
+        <div class="info pending" *ngIf="!transaction.passed && !transaction.failed">
+            Pending
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="user-info">
+            <span class="source">{{transaction.source}}</span>
+            <span *ngIf="transaction.target" class="target"> -> {{transaction.target}}</span>
+        </div>
+        <div class="type {{transaction.type}}">{{transaction.type}}</div>
+        <div class="date {{transaction.type}}">Arrived at {{getDate(transaction.arrivedAt)}}</div>
+        <div class="date {{transaction.type}}">Processed at {{getDate(transaction.processAt)}}</div>
+        <div class="amount {{getAmountClass(transaction)}}">${{transaction.amount}}</div>
+    </div>
+</div>
