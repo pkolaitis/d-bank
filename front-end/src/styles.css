@@ -53,3 +53,12 @@ body {
     }
   }
   
+.box-area {
+  display: inline-block;
+  width: 49%;
+  vertical-align: top;
+ 
+} 
+.box-area.middle {
+  vertical-align: middle;
+}

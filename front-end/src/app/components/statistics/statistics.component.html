@@ -1,1 +1,39 @@
-<p>statistics works!</p>
+<h2>Statistics</h2>
+<div *ngIf="statistics">
+    <div class="box-area">
+        <div class="container p-2">
+            <div class="row">
+                <div class="col-sm-6 text-right">
+                    Replica: 
+                </div>
+                <div class="col-sm-6 text-left">
+                    {{statistics.pid}}
+                </div>
+            </div>
+        </div>
+        <h3>Transactions processed</h3>
+        <div class="container p-2" *ngFor="let stat of getKeys(statistics.totals)">
+            <div class="row" *ngIf="stat != 'others'">
+                <div class="col-sm-6 text-right">
+                    {{stat}}: 
+                </div>
+                <div class="col-sm-6 text-left">
+                    {{statistics.totals[stat]}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box-area">
+        <h3>User balances</h3>
+        <div class="container p-2" *ngFor="let user of getKeys(statistics.users)">
+            <div class="row">
+                <div class="col-sm-6 text-right">
+                    {{statistics.users[user].username}}: 
+                </div>
+                <div class="col-sm-6 text-left">
+                    ${{statistics.users[user].balance}}
+                </div>
+            </div>
+        </div>
+    </div>    
+</div>

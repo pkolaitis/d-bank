@@ -38,5 +38,5 @@ export function createTransaction(){
     return data;
 }
 export function getRandomNumber(){
-    return Math.round(Math.random() * 1024)
+    return Math.round(Math.random() * 480)
 }

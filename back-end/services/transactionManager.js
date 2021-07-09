@@ -12,26 +12,28 @@ const transactionManager = {
   },
   processTransactions: function () {
     const max = new Date().getTime();
-    const min = max - configManager.processWindow;
+    const min = max - 2 * configManager.processWindow;
     const times = Object.keys(process.data.transactions).filter(x => x < max && x >= min);
     times.forEach(timestamp => {
       process.data.transactions[timestamp].forEach(transaction => {
-        if(process.data.users[transaction.source] && transaction.amount > 0 && !transaction.passed && !transaction.failed){
-          if(transaction.type === "deposit"){
-            transaction.passed = true;
-            process.data.users[transaction.source].balance += transaction.amount;
-          } else if (transaction.type === "withdraw" && process.data.users[transaction.source].balance >= transaction.amount) {
-            transaction.passed = true;
-            process.data.users[transaction.source].balance -= transaction.amount;
-          } else if(transaction.type === "transfer" && process.data.users[transaction.source].balance >= transaction.amount && process.data.users[transaction.target]) {
-            transaction.passed = true;
-            process.data.users[transaction.source].balance -= transaction.amount;
-            process.data.users[transaction.target].balance += transaction.amount;
+        if(!transaction.passed && !transaction.failed){
+          if(process.data.users[transaction.source] && transaction.amount > 0){
+            if(transaction.type === "deposit"){
+              transaction.passed = true;
+              process.data.users[transaction.source].balance += transaction.amount;
+            } else if (transaction.type === "withdraw" && process.data.users[transaction.source].balance >= transaction.amount) {
+              transaction.passed = true;
+              process.data.users[transaction.source].balance -= transaction.amount;
+            } else if(transaction.type === "transfer" && process.data.users[transaction.source].balance >= transaction.amount && process.data.users[transaction.target]) {
+              transaction.passed = true;
+              process.data.users[transaction.source].balance -= transaction.amount;
+              process.data.users[transaction.target].balance += transaction.amount;
+            }else{
+              transaction.failed = true;
+            }
           }else{
             transaction.failed = true;
           }
-        }else{
-          transaction.failed = true;
         }
         logManager.info(`${process.pid} processing transaction ${JSON.stringify(transaction)}`);
       });
@@ -43,6 +45,7 @@ const transactionManager = {
       failed: 0,
       passed: 0,
       total: 0,
+      others: []
     };
     console.log(JSON.stringify(times));
     times.forEach(timestamp => {
@@ -50,6 +53,7 @@ const transactionManager = {
       transactions[timestamp].forEach(transaction => {
         if(transaction.failed) result.failed++;
         else if(transaction.passed) result.passed++;
+        else result.others.push(transaction);
         result.total++;
       });
     });
