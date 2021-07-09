@@ -1,0 +1,88 @@
+Initial goal
+- work on nodejs + angular tech stack (v)
+- utilize docker for easier launch (v)
+- distributed back end api (v)
+    provide endpoints for 
+    - login (v)
+    - userDate (v)
+    - transactions history (v)
+    - post a transaction (v)
+    - kill a replica to force a failure check (v)
+    - provide token superpass for api testing ( see insomnia file api.json ) (v)
+    A given set of users and initial state is given to bypass irrelevant development about registering
+
+- consensus mechanism e-paxos (v)
+- recover after failure (v)
+- replica keeping their data separately from the rest (v)
+- communication of replicas utilizing messaging mechanism (v)
+- front end screens for
+    - login, (v)
+    - welcome, (v)
+    - transactions ( history + new ) (v)
+    - statistics for user balances and transactions counters ( failed, passed etc ) (v)
+    - run generated scenarios, to facilitate greated traffic for observation and evaluation (v)
+
+
+Architecture
+A single node.js application spawns a number of workers to start listening to traffic from the banking app
+Each one of those workers copies data from other workers already on the job and starts contributing
+Any new transaction is posted on a single worker that broadcasts this change to rest of the network
+Each worker that learns about this transaction ( that is set to be processed at the future based on E-Paxos mechanism )
+prepares and keeps it in its backlog until its time has come. In the meantime all workers use messaging mechanism to align with
+the rest about any dependencies on its transactions. Therefore, all workers are aligned with the herd about which transactions 
+will be run and in what order. So we reach consistency.
+Any transaction in runtime might fail due to insufficient funds so it is marked as failed, otherwise as passed. Initially, it is
+marked as pending.
+
+A user can login in the app using one of those test accounts
+( user1...15 / admin using same as password )
+
+If you need unrestricted access I suggest you use the admin user that can access the scenarios screen as well and produce traffic.
+Since all workers listen on the same port and use round robin to take turns based on the volume of the traffic you mind need to
+do a couple of refreshes without waiting to be able to view data from a different one. On statistics and transaction screen worker id 
+is visible so it will be transparent for testing 
+
+
+The main idea of this application is to be able to run a set of transactions distributed, 
+based on a consensus mechanism to have all replicas aligned or what will be executed in what order. 
+This mechanism is E-Paxos that allows for leaderless consensus as presented recently here 
+https://www.usenix.org/conference/nsdi21/presentation/tollman
+
+The way to evaluate this application is by means of consistency, error handling, latency deviation from one worker to another,
+or even between transactions since network is not always reliable, sanity check and correctness of results.
+
+By adjusting the number of workers to be used I saw that since there is higher availability ( under machine restrictions ) 
+execution time decreases, which was the expected result anyway. Using 1 worker a test scenario of 1000 transactions needs more than 
+10 minutes to execute. Using 4 workers brings that time down to 3 minutes. Keep in mind that there is always some forced delay to
+emulate network RTTs and latency. For the large scenario of 10000 transactions web requests were cancelled by browser due to too much delay
+while for 12 workers ( as much concurrency my machine can offer ) that time is brought down to 5 minutes.
+
+As far as inconsistency is concerned, since all replicas are aligned and committed on the set AND the order of the transactions 
+to be run the result verifies that E-Paxos works well on our distributed banking app and there is no inconsistency between workers data.
+There is also a mechanism in place that will report such errors and will consult with the rest of the workers to have a healthy data collection
+following initialization mechanism as it comes handy
+
+Since there is no network error or hardware issue that would cause one worker to fail, I have added an endpoint that triggers worker failure and 
+recovery by the orchastrator, who doesn't get involved in the banking back end computations.
+
+The synthesized dataset has 16 users with various balances. Each one can login to the system and transact ( only asking for transactions from 
+their account, as a banking system would do). Then following their transaction history they can track what happened recently.
+Each transaction can be a deposit, a withdraw or a transfer. Only a transfer is between two customer accounts and it only takes place when both accounts 
+exists and the charged one has sufficient funds. 
+
+For authentication I have used the jwt mechanism that comes in really handy and by utilizing interceptors I was able to avoid polluting tha core code of the app
+with authentication checks and cors policy issues.
+
+
+
+Finally the presentation will include app demo presentation, and some scenarios run manually and automatically to observe app sanity and consistency.
+Statistics and history screens are really helpful to follow this up.
+Logs are also available in the app to follow actions trail throughout the app and their results, however there is no dashboard for them, they
+are only available via console
+
+I have developed this project as part of the Distributed Systems course http://cgi.di.uoa.gr/~mema/courses/m120/m120.html
+
+Panagiotis Kolaitis
+@2021
+
+

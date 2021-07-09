@@ -142,7 +142,7 @@ if (cluster.isMaster) {
         if(msg.event === "transaction") {
           const transaction = msg.data;
           process.data.transactions = process.data.transactions || {};
-          process.data.size = (process.data.size || 0) + 1;
+          // process.data.size = (process.data.size || 0) + 1;
           process.data.transactions[transaction.processAt] = process.data.transactions[transaction.processAt] || [];
           process.data.transactions[transaction.processAt].push(transaction);
           process.data.history = process.data.history || [];
@@ -152,7 +152,7 @@ if (cluster.isMaster) {
     }
   });
 
-  setInterval(transactionManager.processTransactions, configManager.processWindow);
+  process.interval = setInterval(transactionManager.processTransactions, configManager.processWindow);
   app.use(cors());
   app.listen(configManager.port);
 }

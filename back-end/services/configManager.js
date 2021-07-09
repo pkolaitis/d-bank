@@ -1,5 +1,5 @@
 const configManager = {
-  replicas: 4 || process.env.replicas || require('os').cpus().length,
+  replicas: process.env.replicas || require('os').cpus().length,
   ddelay: process.env.ddelay || 2000,
   port: process.env.port || 4201,
   statPort: process.env.statPort || 4202,

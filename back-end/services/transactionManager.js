@@ -12,11 +12,12 @@ const transactionManager = {
   },
   processTransactions: function () {
     const max = new Date().getTime();
-    const min = max - 2 * configManager.processWindow;
-    const times = Object.keys(process.data.transactions).filter(x => x < max && x >= min);
+    const times = Object.keys(process.data.transactions).filter(x => x < max);
     times.forEach(timestamp => {
       process.data.transactions[timestamp].forEach(transaction => {
         if(!transaction.passed && !transaction.failed){
+          logManager.info(`${process.pid} processing transaction ${JSON.stringify(transaction)}`);
+
           if(process.data.users[transaction.source] && transaction.amount > 0){
             if(transaction.type === "deposit"){
               transaction.passed = true;
@@ -35,7 +36,6 @@ const transactionManager = {
             transaction.failed = true;
           }
         }
-        logManager.info(`${process.pid} processing transaction ${JSON.stringify(transaction)}`);
       });
     });
   },
