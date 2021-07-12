@@ -135,6 +135,7 @@ if (cluster.isMaster) {
   process.data.transactions = process.data.transactions || {};
   process.data.history = process.data.history || [];
   process.on('message', function(msg) {
+    // e-paxos phase 2
     switch(msg.cmd) {
       case 'broadcast':
         // handle transaction to be executed

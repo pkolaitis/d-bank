@@ -3,6 +3,7 @@ const logManager = require("./logManager");
 
 const transactionManager = {
   newTransaction: function (transaction) {
+    // e-paxos phase 1
     logManager.info(`newTransaction arrived ${process.pid} ${JSON.stringify(transaction)}`);
     transaction.originator = process.pid;
     // adding a couple milliseconds randomly for each transaction to be delayed
@@ -11,6 +12,7 @@ const transactionManager = {
     process.send({cmd: 'broadcast', event: 'transaction', data: transaction});
   },
   processTransactions: function () {
+    // e-paxos phase 3
     const max = new Date().getTime();
     const times = Object.keys(process.data.transactions).filter(x => x < max);
     times.forEach(timestamp => {
